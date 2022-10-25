@@ -1,18 +1,11 @@
 
 # global
 library(shiny)
-library(fuzzyjoin) # Package pour faire des jointures probabilistes
-library(stringdist) # Mesures de distance entre chaînes de caractères
+library(phacochr)
 library(readxl) # Pour lire des fichiers excel
 library(sf) # Package de SIG
 library(tmap) # Package de carto
-library(mapsf) # Package de carto
-library(tidyverse) # Ensemble de fonctions pour manipuler une base de données
-library(doParallel) # Pour du calcul multicores
-library(foreach) # Pour du calcul multicores
-library(gt) # Pour l'output HTML si adresse solo
-library(stringr)
-library(phacochr)
+
 
 
 #source("Script géocodage/Script de géocodage parallel.R")
@@ -28,7 +21,7 @@ foo <- function() {
 
 
 
-ui <- navbarPage(title = "Phacoch-R",
+ui <- navbarPage(title = " ",
                  # PAGE IMPORTATION DES DONNÉES
                  tabPanel(title = "Importation des données",
                           fluidPage(
@@ -120,9 +113,9 @@ ui <- navbarPage(title = "Phacoch-R",
                                              label = "Approximation maximale autorisée pour la géolocalisation du batiment - en nombre de numéros à gauche ou à droite",
                                              value = 50),
                                 # Input: Select langue ----
-                                radioButtons("lang_encoded", "Langue des adresses (augmente la rapidité du goécodage)",
-                                             choices = c("FR-NL-DE"="FR-NL-DE","FR" = "FR", "NL"="NL"),
-                                             selected = "FR-NL-DE"),
+                                checkboxGroupInput("lang_encoded", "Langue des adresses (augmente la rapidité du géocodage)",
+                                             choices = c("FR","NL","DE"),
+                                             selected =  c("FR","NL","DE"), inline = TRUE),
                                 # Input: corrections orthographiques ----
                                 checkboxInput("corrections_REGEX", "Correction orthographique des adresses", TRUE),
                                 # Input: élargissement ----
@@ -134,12 +127,18 @@ ui <- navbarPage(title = "Phacoch-R",
                               ),
                               # Main panel for displaying outputs ----
                               mainPanel(
-                                shinyjs::useShinyjs(),
+                                #shinyjs::useShinyjs(),
                                 h4("Géocodage"),
                                 # Output: Data file ---- Summary_full
-                                #shinycssloaders::withSpinner(tableOutput("Summary_full"),type = 3, color = "#636363", color.background ="#ffffff", size = 0.8),
-                                textOutput("text")
+                                shinycssloaders::withSpinner(tableOutput("summary"),type = 3, color = "#636363", color.background ="#ffffff", size = 0.8),
+                                #textOutput("cat")
                               )))),
+                 tabPanel(title = "Cartes",
+                          fluidPage(
+                            shinycssloaders::withSpinner(tmapOutput(outputId = "tmapMap", width = "100%", height = 800)
+                                                         ,type = 3, color = "#636363", color.background ="#ffffff", size = 0.8)
+
+                          )),
                  tabPanel(title = "Export",
                           fluidPage(
                             # Sidebar layout with input and output definitions ----
@@ -177,14 +176,19 @@ ui <- navbarPage(title = "Phacoch-R",
 server <- function(input, output, session) {
   # PAGE 1 : IMPORTATION ET AFFICHAGE
   # importation des données
-  data_to_geocode<- reactive({
-    req(input$file1)
+
+    data_to_geocode<- reactive({
+    if (is.null(input$file1)) {  data.frame(nom= c("Observatoire de la Santé et du Social", "ULB"),
+                                                                          rue= c("rue Beilliard","avenue Antoine Depage"),
+                                                                          num=c("71", "30"),
+                                                                          code_postal=c("1040","1000"))}else{
     if(input$fileType_Input == 1) {read_delim(input$file1$datapath, delim = input$sep,quote = input$quote,trim_ws = TRUE)}
-    else{read_excel(input$file1$datapath,col_types= "text")}})
+    if(input$fileType_Input == 2) {read_excel(input$file1$datapath,col_types= "text")}
+    }})
 
   # Affichage des premières lignes
   output$head_data_to_geocode <- renderTable({
-    req(input$file1)
+   # req(input$file1)
     head(data_to_geocode())})
 
   # PAGE 2 : GÉOCODAGE
@@ -198,22 +202,46 @@ server <- function(input, output, session) {
 
   # Lancer le géocodage
 
-
   result <- eventReactive(input$geocode, {
+    # NULL a la place des -
+    if(input$colonne_rue=="-"){colonne_rue<-NULL}else{colonne_rue<-input$colonne_rue}
+    if(input$colonne_num=="-"){colonne_num<-NULL}else{colonne_num<-input$colonne_num}
+    if(input$colonne_code_postal=="-"){colonne_code_postal<-NULL}else{colonne_code_postal<-input$colonne_code_postal}
+    if(input$colonne_num_rue=="-"){colonne_num_rue<-NULL}else{colonne_num_rue<-input$colonne_num_rue}
+    if(input$colonne_num_rue_code_postal=="-"){colonne_num_rue_code_postal<-NULL}else{colonne_num_rue_code_postal<-input$colonne_num_rue_code_postal}
+    if(input$colonne_rue_code_postal=="-"){colonne_rue_code_postal<-NULL}else{colonne_rue_code_postal<-input$colonne_rue_code_postal}
+
+    # pour l'affichage des messages en html
+    #withCallingHandlers({
+    #  shinyjs::html("text", "")
+
+  #  data_path <- "/home/user/github/phacochr_data/data_phacochr/"
      phaco_geocode(data_to_geocode=data_to_geocode(),
-                                colonne_rue = input$colonne_rue,
-                                colonne_num = input$colonne_num,
-                                colonne_code_postal = input$colonne_code_postal,
-                                colonne_num_rue = input$colonne_num_rue,
-                                colonne_num_rue_code_postal = input$colonne_num_rue_code_postal,
-                                colonne_rue_code_postal = input$colonne_rue_code_postal,
+                                colonne_rue=colonne_rue,
+                                colonne_num = colonne_num,
+                                colonne_code_postal = colonne_code_postal,
+                                colonne_num_rue = colonne_num_rue,
+                                colonne_num_rue_code_postal = colonne_num_rue_code_postal,
+                                colonne_rue_code_postal = colonne_rue_code_postal,
                                 method_stringdist = input$method_stringdist,
                                 corrections_REGEX = input$corrections_REGEX,
                                 error_max = input$error_max,
                                 approx_num_max = input$approx_num,
                                 elargissement_com_adj = input$elargissement_com_adj,
                                 lang_encoded = input$lang_encoded,
-                                data_path="data_phacochr/")})
+                               path_data= "data_phacochr/")
+  #}
+  #,
+  # Affichage des messages à la ligne
+  #cat = function(m) {shinyjs::html(id = "text", html = paste0(m$cat, '<br>'), add = TRUE)})
+
+    })
+
+    # Affichage des tableau récap
+    output$summary <-  renderTable({
+      req(input$geocode)
+      result()$summary[2:nrow(result()$summary),c(1:3,6:8,5)]
+    })
 
 
   # Affichage des données géocodées
@@ -221,7 +249,7 @@ server <- function(input, output, session) {
     req(input$geocode)
     head(result()$data_geocoded)
   })
-
+ # Télécharger les données
   output$downloadData <- downloadHandler(
     filename = function() {
       paste0(input$file1$name, "_phacochr", input$fileType_output)
@@ -233,6 +261,21 @@ server <- function(input, output, session) {
         st_write(result()$data_geocoded_sf, file)
       }
     })
+
+  # Carte interactive
+
+  output$tmapMap <- renderTmap({
+    req(result()$data_geocoded_sf)
+    FULL_GEOCODING_sf<-  result()$data_geocoded_sf
+    name_to_show <- "nom"
+    title_carto = ""
+
+    zoom_geocoded <- TRUE
+    nom_admin <- TRUE
+    source("R/Carto des points géocodés - tmap interactif_6_14.R", local=TRUE)
+    Carto_map
+
+  })
 
 
 

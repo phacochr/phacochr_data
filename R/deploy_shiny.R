@@ -3,4 +3,4 @@ rsconnect::setAccountInfo(name='phacoch-r',
                           secret='flZSH863SQkPv0qq1Qj5sVH4FfdjcWTXHiMXKNGc')
 
 library(rsconnect)
-rsconnect::deployApp('/home/user/github/phacochr')
+rsconnect::deployApp('/home/user/github/phacochr_data')
