@@ -2,13 +2,21 @@
 # * Type de carte : "static" ou "interactif"
 # Les deux types sont programmés dans le script ci-dessous, mais en static tmap produits des résultats différents selon que l'on est sous windows ou linux avec les mêmes paramètres => pas ok
 # tmap est donc utilisé uniquement pour produire des cartes interactives
-mode_carto <- "interactif"
+library(sf)
+library(stringr)
 
+
+mode_carto <- "interactif"
+name_to_show <- "nom"
+title_carto = ""
+
+zoom_geocoded <- TRUE
+nom_admin <- TRUE
 
 # 1. BRUXELLES ============================================================================================================================
 
 # S'il y a des points uniquement à Bruxelles
-if ((str_detect(paste(unique(FULL_GEOCODING_sf$Region[!is.na(FULL_GEOCODING_sf$cd_rgn_refnis)]), collapse = " "), "04000")) & (length(unique(FULL_GEOCODING_sf$cd_rgn_refnis[!is.na(FULL_GEOCODING_sf$cd_rgn_refnis)])) == 1)){
+if ((str_detect(paste(unique(FULL_GEOCODING_sf$cd_rgn_refnis[!is.na(FULL_GEOCODING_sf$cd_rgn_refnis)]), collapse = " "), "04000")) & (length(unique(FULL_GEOCODING_sf$cd_rgn_refnis[!is.na(FULL_GEOCODING_sf$cd_rgn_refnis)])) == 1)){
 
 
 # a) Geopackages --------------------------------------------------------------------------------------------------------------------------

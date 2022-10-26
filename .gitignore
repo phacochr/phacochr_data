@@ -3,5 +3,4 @@
 .RData
 .Ruserdata
 rsconnect/
-R/app_old.R
 R/deploy_shiny_token.R

@@ -1,17 +1,11 @@
 # global
 library(shiny)
-library(fuzzyjoin) # Package pour faire des jointures probabilistes
-library(stringdist) # Mesures de distance entre chaînes de caractères
-library(readxl) # Pour lire des fichiers excel
-library(sf) # Package de SIG
+library(sf)
 library(tmap) # Package de carto
-library(mapsf) # Package de carto
-library(tidyverse) # Ensemble de fonctions pour manipuler une base de données
-library(doParallel) # Pour du calcul multicores
-library(foreach) # Pour du calcul multicores
-library(gt) # Pour l'output HTML si adresse solo
-library(stringr)
 library(phacochr)
+library(stringr)
+library(tidyverse)
+library(fuzzyjoin)
 
 
 
@@ -272,14 +266,12 @@ server <- function(input, output, session) {
   # Carte interactive
 
   output$tmapMap <- renderTmap({
-    req(result()$data_geocoded_sf)
-    FULL_GEOCODING_sf<-  result()$data_geocoded_sf
-    name_to_show <- "nom"
-    title_carto = ""
 
-    zoom_geocoded <- TRUE
-    nom_admin <- TRUE
-    source("R/Carto des points géocodés - tmap interactif_6_14.R", local=TRUE)
+    req(result()$data_geocoded_sf)
+
+    FULL_GEOCODING_sf<-  result()$data_geocoded_sf
+
+    source("script/Carto des points géocodés - tmap interactif_6_14.R", local=TRUE)
     Carto_map
 
   })
