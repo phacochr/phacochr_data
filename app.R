@@ -6,7 +6,7 @@ library(phacochr)
 library(stringr)
 library(tidyverse)
 library(fuzzyjoin)
-
+library(readxl)
 
 
 #source("Script géocodage/Script de géocodage parallel.R")
@@ -182,9 +182,9 @@ server <- function(input, output, session) {
     if (is.null(input$file1)) {  data.frame(nom= c("Observatoire de la Santé et du Social", "ULB"),
                                                                           rue= c("rue Beilliard","avenue Antoine Depage"),
                                                                           num=c("71", "30"),
-                                                                          code_postal=c("1040","1000"))}else{
-    if(input$fileType_Input == 1) {read_delim(input$file1$datapath, delim = input$sep,quote = input$quote,trim_ws = TRUE)}
-    if(input$fileType_Input == 2) {read_excel(input$file1$datapath,col_types= "text")}
+                                                                          code_postal=c("1040","1000"))}
+    else if(input$fileType_Input == 1) {read_delim(input$file1$datapath, delim = input$sep,quote = input$quote,trim_ws = TRUE)}
+    else if(input$fileType_Input == 2) {read_excel(input$file1$datapath,col_types= "text")
     }})
 
   # Affichage des premières lignes
