@@ -1,10 +1,17 @@
-
 # global
 library(shiny)
-library(phacochr)
+library(fuzzyjoin) # Package pour faire des jointures probabilistes
+library(stringdist) # Mesures de distance entre chaînes de caractères
 library(readxl) # Pour lire des fichiers excel
 library(sf) # Package de SIG
 library(tmap) # Package de carto
+library(mapsf) # Package de carto
+library(tidyverse) # Ensemble de fonctions pour manipuler une base de données
+library(doParallel) # Pour du calcul multicores
+library(foreach) # Pour du calcul multicores
+library(gt) # Pour l'output HTML si adresse solo
+library(stringr)
+library(phacochr)
 
 
 
