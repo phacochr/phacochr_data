@@ -85,25 +85,30 @@ ui <- navbarPage(title = " ",
                           )),
                  # PAGE GEOCODAGE
                  tabPanel(title = "Géocodage",
-                          fluidPage(
                             # Sidebar layout with input and output definitions ----
                             sidebarLayout(
 
                               # Sidebar panel for inputs ----
                               sidebarPanel(
+                                fluidRow(
+                                  column(6,
+
                                 # Input: Select variables ----
+                                h4("Champs adresse"),
                                 selectInput(inputId = "colonne_num", label = "Numéro", choices = NULL),
                                 selectInput(inputId = "colonne_rue", label = "Rue", choices = NULL),
                                 selectInput(inputId = "colonne_code_postal", label = "Code postal", choices = NULL),
+                                # Horizontal line ----
+                                tags$hr(),
                                 selectInput(inputId = "colonne_num_rue", label = "Numéro + Rue", choices = NULL),
                                 selectInput(inputId = "colonne_num_rue_code_postal", label = "Numéro + Rue + Code postal", choices = NULL),
                                 selectInput(inputId = "colonne_rue_code_postal", label = "Rue + Code postal", choices = NULL),
-
-                                # Horizontal line ----
-                                tags$hr(),
+                                  ),
+                                column(6,
+                                h4("Options Avancées"),
                                 # Input: Select méthode ----
-                                radioButtons("method_stringdist", "Méthode",
-                                             choices = c(lcs = "lcs"),
+                                selectInput("method_stringdist", "Méthode pour la jointure inexacte",
+                                             choices = c("lcs (par défaut)"="lcs", "osa", "lv", "dl", "hamming", "qgram", "cosine", "jaccard", "jw","soundex"),
                                              selected = "lcs"),
                                 # Input: Nombre d'erreur ----
                                 numericInput(inputId = "error_max",
@@ -124,8 +129,8 @@ ui <- navbarPage(title = " ",
                                 # Horizontal line ----
                                 tags$hr(),
                                 actionButton("geocode", "Lancer le géocodage"),
-
-                              ),
+)), width=4)
+                                ,
                               # Main panel for displaying outputs ----
                               mainPanel(
                                 #shinyjs::useShinyjs(),
@@ -133,7 +138,7 @@ ui <- navbarPage(title = " ",
                                 # Output: Data file ---- Summary_full
                                 shinycssloaders::withSpinner(tableOutput("summary"),type = 3, color = "#636363", color.background ="#ffffff", size = 0.8),
                                 #textOutput("cat")
-                              )))),
+                              ))),
                  tabPanel(title = "Cartes",
                           fluidPage(
                             shinycssloaders::withSpinner(tmapOutput(outputId = "tmapMap", width = "100%", height = 800)
