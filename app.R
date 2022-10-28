@@ -95,6 +95,7 @@ ui <- navbarPage(title = " ",
 
                                 # Input: Select variables ----
                                 h4("Champs adresse"),
+                                h6("Sélectionnez les champs avec les adresses:"),
                                 selectInput(inputId = "colonne_num", label = "Numéro", choices = NULL),
                                 selectInput(inputId = "colonne_rue", label = "Rue", choices = NULL),
                                 selectInput(inputId = "colonne_code_postal", label = "Code postal", choices = NULL),
@@ -103,7 +104,11 @@ ui <- navbarPage(title = " ",
                                 selectInput(inputId = "colonne_num_rue", label = "Numéro + Rue", choices = NULL),
                                 selectInput(inputId = "colonne_num_rue_code_postal", label = "Numéro + Rue + Code postal", choices = NULL),
                                 selectInput(inputId = "colonne_rue_code_postal", label = "Rue + Code postal", choices = NULL),
-                                  ),
+                                h6("Notes :"),
+                                h6("- Toutes les options ne doivent pas être remplie."),
+                                h6("- Il est préférable d'avoir des champs séparés pour chacune des informations (numéro, rue, code postal)."),
+                                h6("- Les mêmes informations (numéro, rue, code postal) ne peuvent être reprises dans plusieurs champs. "),
+                                                                  ),
                                 column(6,
                                 h4("Options Avancées"),
                                 # Input: Select méthode ----
@@ -118,15 +123,21 @@ ui <- navbarPage(title = " ",
                                 numericInput(inputId = "approx_num",
                                              label = "Approximation maximale autorisée pour la géolocalisation du batiment - en nombre de numéros à gauche ou à droite",
                                              value = 50),
-                                # Input: Select langue ----
+                                # Input: mid num ----
+                                checkboxInput("mid_street", "Prendre le numéro du milieu de la rue si le numéro n'est pas trouvé", TRUE),
+                                # Horizontal line ----
+                                tags$hr(),
+                                  # Input: Select langue ----
                                 checkboxGroupInput("lang_encoded", "Langue des adresses (augmente la rapidité du géocodage)",
                                              choices = c("FR","NL","DE"),
                                              selected =  c("FR","NL","DE"), inline = TRUE),
+                                # Horizontal line ----
+                                tags$hr(),
                                 # Input: corrections orthographiques ----
                                 checkboxInput("corrections_REGEX", "Correction orthographique des adresses", TRUE),
                                 # Input: élargissement ----
                                 checkboxInput("elargissement_com_adj", "Elargir la recherche des rues non trouvées aux communes adjacentes", TRUE),
-                                # Horizontal line ----
+                               # Horizontal line ----
                                 tags$hr(),
                                 actionButton("geocode", "Lancer le géocodage"),
 )), width=4)
@@ -235,6 +246,7 @@ server <- function(input, output, session) {
                                 approx_num_max = input$approx_num,
                                 elargissement_com_adj = input$elargissement_com_adj,
                                 lang_encoded = input$lang_encoded,
+                                mid_street = input$mid_street,
                                path_data= "data_phacochr/")
   #}
   #,
