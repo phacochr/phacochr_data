@@ -13,15 +13,6 @@ library(readxl)
 
 options (shiny.maxRequestSize=300*1024^2)
 # ui
-
-foo <- function() {
-  message("one")
-  Sys.sleep(0.5)
-  message("two")
-}
-
-
-
 ui <- navbarPage(title = " ",
                  # PAGE IMPORTATION DES DONNÉES
                  tabPanel(title = "Importation des données",
